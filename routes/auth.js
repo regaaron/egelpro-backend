@@ -16,8 +16,8 @@ router.post("/saveUser",async(req,res) =>{
 
         if(rows.length === 0){
             await pool.query(
-                "INSERT INTO usuarios (uid,nombre,correo) VALUES (?,?,?)", 
-                [uid,nombre,correo]);
+                "INSERT INTO usuarios (uid,nombre,correo,racha_dias,ultima_sesion) VALUES (?,?,?,?,?)", 
+                [uid,nombre,correo,1,new Date()]);
         }else{
             await pool.query(
                 "UPDATE usuarios SET nombre = ?, correo = ? WHERE uid = ?",
@@ -75,9 +75,9 @@ router.post("/updateStreak", async (req, res) => {
       );
 
       if (diffDias === 1) {
-        nuevaRacha = user.racha + 1;
+        nuevaRacha = user.racha_dias + 1;
       } else if (diffDias === 0) {
-        nuevaRacha = user.racha;
+        nuevaRacha = user.racha_dias;
       } else {
         nuevaRacha = 1;
       }
@@ -88,6 +88,7 @@ router.post("/updateStreak", async (req, res) => {
       [nuevaRacha, hoy, uid]
     );
 
+    console.log("Racha actualizada a:", nuevaRacha);
     res.json({ ok: true, racha: nuevaRacha });
   } catch (error) {
     console.error("Error en /auth/updateStreak:", error);
