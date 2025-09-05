@@ -96,5 +96,26 @@ router.post("/updateStreak", async (req, res) => {
   }
 });
 
+//obtener la racha de un usuario
+router.get("/racha/:uid",async(req,res)=>{
+    const { uid } = req.params;
+
+    try{
+        const [rows] = await pool.query("SELECT racha_dias FROM usuarios WHERE uid = ?",[uid]);
+
+         if(rows.length > 0){
+            console.log("Racha: ", rows[0].racha_dias) 
+            res.json({ racha: rows[0].racha_dias });
+             
+        } else {
+            res.json({ racha: 0 });
+        }
+
+    }catch(error){
+        console.error("Error en /auth/racha:", error);
+        res.status(500).json({ok:false,message: "Error al obtener racha"});
+    }
+})
+
 
 module.exports = router;
