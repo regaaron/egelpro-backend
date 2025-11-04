@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-ubuntu:
+    name: Build & test (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and cache (npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (if present)
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: npm test
+
+      - name: Upload test artifacts (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            ./**/test-*.log
+            ./**/results.xml
+
+  build-self-hosted-windows:
+    name: Build & test (self-hosted Windows)
+    runs-on: [self-hosted, windows, dev]
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and cache (npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install dependencies (PowerShell)
+        run: |
+          if (Test-Path package-lock.json) { npm ci } else { npm install }
+        shell: pwsh
+
+      - name: Lint (if present)
+        run: npm run lint --if-present
+        shell: pwsh
+
+      - name: Run tests
+        run: npm test
+        shell: pwsh
+
+      - name: Upload test artifacts (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            ./**/test-*.log
+            ./**/results.xml
+
+  deploy:
+    name: Deploy (placeholder)
+    needs: build-ubuntu
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy placeholder
+        run: |
+          echo "Deploy step placeholder - replace with real deploy commands"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Commit: $GITHUB_SHA"
+
+      - name: Notes
+        run: |
+          echo "To implement CD, replace the 'Deploy placeholder' step with your deploy mechanism (SSH/rsync, Docker build/push, Azure CLI, etc.)."
