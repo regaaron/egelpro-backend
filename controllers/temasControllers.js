@@ -34,19 +34,15 @@ const obtenerTemas = async (req, res) => {
 };
 
 // ✅ Agregar un nuevo tema
-const agregarTema = (req, res) => {
-  const { nombre, descripcion, icono } = req.body;
-
-  if (!nombre || !descripcion || !icono) {
-    return res.status(400).json({ error: 'Faltan datos del tema' });
-  }
-
-  const sql = 'INSERT INTO temas (nombre, descripcion, icono) VALUES (?, ?, ?)';
-  db.query(sql, [nombre, descripcion, icono], (err, result) => {
-    if (err) {
-      console.error('❌ Error al agregar tema:', err);
-      return res.status(500).json({ error: 'Error al agregar tema' });
+const agregarTema = async (req, res) => {
+  try {
+    const { nombre, descripcion, icono } = req.body;
+    if (!nombre || !descripcion || !icono) {
+      return res.status(400).json({ error: 'Faltan datos del tema' });
     }
+
+    const sql = 'INSERT INTO temas (nombre, descripcion, icono) VALUES (?, ?, ?)';
+    const [result] = await db.query(sql, [nombre, descripcion, icono]);
 
     res.status(201).json({
       id: result.insertId,
@@ -55,57 +51,57 @@ const agregarTema = (req, res) => {
       icono,
       subtemas: []
     });
-  });
+  } catch (err) {
+    console.error('❌ Error al agregar tema:', err);
+    res.status(500).json({ error: 'Error al agregar tema' });
+  }
 };
-
-
 
 // ✅ Agregar subtema
-const agregarSubtema = (req, res) => {
-  const { id_tema } = req.params;
-  const { nombre } = req.body;
+const agregarSubtema = async (req, res) => {
+  try {
+    const { id_tema } = req.params;
+    const { nombre } = req.body;
 
-  if (!nombre) {
-    return res.status(400).json({ error: 'Falta el nombre del subtema' });
-  }
-
-  const sql = 'INSERT INTO subtemas (id_tema, nombre) VALUES (?, ?)';
-  db.query(sql, [id_tema, nombre], (err, result) => {
-    if (err) {
-      console.error('❌ Error al agregar subtema:', err);
-      return res.status(500).json({ error: 'Error al agregar subtema' });
+    if (!nombre) {
+      return res.status(400).json({ error: 'Falta el nombre del subtema' });
     }
+
+    const sql = 'INSERT INTO subtemas (id_tema, nombre) VALUES (?, ?)';
+    const [result] = await db.query(sql, [id_tema, nombre]);
 
     res.status(201).json({ id: result.insertId, nombre });
-  });
+  } catch (err) {
+    console.error('❌ Error al agregar subtema:', err);
+    res.status(500).json({ error: 'Error al agregar subtema' });
+  }
 };
 
-// Eliminar tema
-const eliminarTema = (req, res) => {
-  const { id } = req.params;
-  const sql = 'DELETE FROM temas WHERE id_tema = ?';
-  db.query(sql, [id], (err) => {
-    if (err) {
-      console.error('Error al eliminar tema:', err);
-      return res.status(500).json({ error: 'Error al eliminar tema' });
-    }
+// ✅ Eliminar tema
+const eliminarTema = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sql = 'DELETE FROM temas WHERE id_tema = ?';
+    await db.query(sql, [id]);
     res.json({ success: true });
-  });
+  } catch (err) {
+    console.error('❌ Error al eliminar tema:', err);
+    res.status(500).json({ error: 'Error al eliminar tema' });
+  }
 };
 
-// Eliminar subtema
-const eliminarSubtema = (req, res) => {
-  const { id_tema, id_subtema } = req.params;
-  const sql = 'DELETE FROM subtemas WHERE id_tema = ? AND id_subtema = ?';
-  db.query(sql, [id_tema, id_subtema], (err) => {
-    if (err) {
-      console.error('Error al eliminar subtema:', err);
-      return res.status(500).json({ error: 'Error al eliminar subtema' });
-    }
+// ✅ Eliminar subtema
+const eliminarSubtema = async (req, res) => {
+  try {
+    const { id_tema, id_subtema } = req.params;
+    const sql = 'DELETE FROM subtemas WHERE id_tema = ? AND id_subtema = ?';
+    await db.query(sql, [id_tema, id_subtema]);
     res.json({ success: true });
-  });
+  } catch (err) {
+    console.error('❌ Error al eliminar subtema:', err);
+    res.status(500).json({ error: 'Error al eliminar subtema' });
+  }
 };
-
 
 module.exports = {
   obtenerTemas,
