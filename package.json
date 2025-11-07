@@ -15,8 +15,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+<<<<<<< Updated upstream
     "firebase-admin": "^13.5.0",
     "mysql2": "^3.14.4",
     "openai": "^4.104.0"
+=======
+    "firebase-admin": "^13.6.0",
+    "mysql2": "^3.14.4",
+    "nodemon": "^3.1.10"
+>>>>>>> Stashed changes
   }
 }
