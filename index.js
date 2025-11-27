@@ -21,8 +21,14 @@ app.use('/examenes', examenesRoutes);
 app.use('/admin', adminPreguntasAIRoutes);
 app.use('/admin', adminPreguntasRouter);
 
-// Puerto
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+
+
+// Ruta de prueba
+app.get('/', (req, res) => {
+  res.send("🚀 Backend EGEL PRO funcionando correctamente.");
+});
+
+// Iniciar servidor
+app.listen(config.port, () => {
+  console.log(`🚀 Servidor escuchando en el puerto ${config.port}`);
 });
