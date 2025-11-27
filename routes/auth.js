@@ -1,35 +1,53 @@
 const express = require("express"); //sirve para crear rutas
 const router = express.Router(); //sirve para crear rutas
-const admin = require("../firebase"); //importamos firebase admin
 const pool = require("../db"); //importamos la conexion a la base de datos
-
 // POST /auth/saveUser
-router.post("/saveUser",async(req,res) =>{
-    try{
-        const {token,nombre,correo,uid } = req.body; //obtenemos el token del cuerpo de la solicitud y el nombre y correo
-        
-        // 1 verificar token con firebase 
-        const decoded = await admin.auth().verifyIdToken(token);//verificamos el token con firebase
+router.post("/saveUser", async (req, res) => {
+    try {
+        const { nombre, correo, uid } = req.body;
 
-        //2 Guardar o actulizar usuario en la base de datos
-        const [rows] = await pool.query("SELECT * FROM usuarios WHERE uid = ?", [uid]); //buscamos el usuario por uid
+        // Validación básica
+        if (!uid || !nombre || !correo) {
+            return res.status(400).json({
+                ok: false,
+                message: "Faltan datos obligatorios (uid, nombre, correo)"
+            });
+        }
 
-        if(rows.length === 0){
+        // Verificar si el usuario ya existe
+        const [rows] = await pool.query(
+            "SELECT * FROM usuarios WHERE uid = ?",
+            [uid]
+        );
+
+        if (rows.length === 0) {
+            // Crear usuario nuevo
             await pool.query(
-                "INSERT INTO usuarios (uid,nombre,correo,racha_dias,ultima_sesion) VALUES (?,?,?,?,?)", 
-                [uid,nombre,correo,1,new Date()]);
-        }else{
+                `INSERT INTO usuarios (uid, nombre, correo, racha_dias, ultima_sesion)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [uid, nombre, correo, 1, new Date()]
+            );
+        } else {
+            // Actualizar si ya existe
             await pool.query(
-                "UPDATE usuarios SET nombre = ?, correo = ? WHERE uid = ?",
-                [nombre,correo,uid]
+                `UPDATE usuarios 
+                 SET nombre = ?, correo = ?
+                 WHERE uid = ?`,
+                [nombre, correo, uid]
             );
         }
 
-        res.json({ ok: true, message: "Usuario guardado o actualizado correctamente"});
+        res.json({
+            ok: true,
+            message: "Usuario guardado o actualizado correctamente"
+        });
 
-    }catch(error){
+    } catch (error) {
         console.error("Error en /auth/saveUser:", error);
-        res.status(401).json({ok:false,message: "Token no valido"});
+        res.status(500).json({
+            ok: false,
+            message: "Error interno del servidor"
+        });
     }
 });
 
