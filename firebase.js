@@ -25,6 +25,10 @@ if (!serviceAccountConfig.project_id || !serviceAccountConfig.private_key) {
     // throw new Error("Firebase admin initialization failed due to missing environment variables.");
 }
 
+// ** AGREGAR ESTO PARA DEBUGGING **
+console.log('--- Debugging Private Key ---');
+console.log(serviceAccountConfig.private_key); // Esto imprimirá la clave con saltos de línea reales
+console.log('-----------------------------');
 // 3. Inicializar Firebase
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccountConfig),
