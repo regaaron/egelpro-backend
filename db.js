@@ -1,25 +1,22 @@
-const mysql = require('mysql2/promise');
-const config = require('./config');
-
-const isRailway = config.db.host !== "localhost";
+const mysql = require("mysql2/promise");
 
 const pool = mysql.createPool({
-  host: config.db.host,
-  user: config.db.user,
-  password: config.db.password,
-  database: config.db.database,
-  port: config.db.port,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  ssl: isRailway ? { rejectUnauthorized: true } : false
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
 
 // Test de conexión
 (async () => {
   try {
     const connection = await pool.getConnection();
-    console.log("✅ Connected to MySQL:", config.db.host);
+    console.log("✅ Connected to MySQL at", process.env.MYSQLHOST);
     connection.release();
   } catch (err) {
     console.error("❌ MySQL connection error:", err.message);
