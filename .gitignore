@@ -59,3 +59,4 @@ ecosystem.config.js
 .env.test.local
 .env.production.local
 
+serviceAccountKey.json
