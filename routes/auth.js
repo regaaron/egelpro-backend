@@ -1,6 +1,5 @@
 const express = require("express"); //sirve para crear rutas
 const router = express.Router(); //sirve para crear rutas
-const admin = require("../firebase"); //importamos firebase admin
 const pool = require("../db"); //importamos la conexion a la base de datos
 // POST /auth/saveUser
 router.post("/saveUser", async (req, res) => {
