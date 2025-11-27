@@ -3,15 +3,16 @@
 
 require('dotenv').config();
 const OpenAI = require('openai');
+const config = require('./config'); // ← OPCIONAL si agregas un config central
 
 async function main() {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = config.openai.key || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     console.error('ERROR: Falta OPENAI_API_KEY en .env');
     process.exit(1);
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const model = config.openai.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
   const client = new OpenAI({ apiKey });
 

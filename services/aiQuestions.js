@@ -1,12 +1,13 @@
 const OpenAI = require('openai');
+const config = require('./config'); // ← OPCIONAL si agregas un config central
 
 // Pequeño "circuit breaker" para evitar spamear la API si hay 429 por cuota
 let quotaCooldownUntil = 0; // timestamp ms hasta el que no intentaremos llamar a la API
 
 // Crea un cliente de OpenAI si existe la API key; si no, el módulo funciona en modo "no-op"
 function getClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const enabledEnv = String(process.env.OPENAI_ENABLED || '1').toLowerCase();
+  const apiKey =  config.openai.key || process.env.OPENAI_API_KEY;
+  const enabledEnv = String(config.openai.enabled || process.env.OPENAI_ENABLED || '1').toLowerCase();
   const enabled = !['0', 'false', 'off', 'no'].includes(enabledEnv);
   if (!enabled) return null;
   if (!apiKey) return null;
@@ -57,7 +58,7 @@ async function generateAIQuestions({ tema, sub, count }) {
 
     // Usar Responses API como en el test mínimo
     const completion = await client.responses.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      model: config.openai.model || process.env.OPENAI_MODEL || 'gpt-4o-mini',
       input,
       temperature: 0.7,
       store: false

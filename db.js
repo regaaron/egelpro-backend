@@ -1,25 +1,28 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+const config = require('./config');
+
+const isRailway = config.db.host !== "localhost";
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  port: process.env.DB_PORT,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: config.db.host,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database,
+  port: config.db.port,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  ssl: isRailway ? { rejectUnauthorized: true } : false
 });
 
 // Test de conexión
 (async () => {
   try {
     const connection = await pool.getConnection();
-    console.log('Connected to the database successfully.');
-    connection.release(); // liberamos la conexión de vuelta al pool
+    console.log("✅ Connected to MySQL:", config.db.host);
+    connection.release();
   } catch (err) {
-    console.error('Error connecting to the database:', err.message);
+    console.error("❌ MySQL connection error:", err.message);
   }
 })();
 
