@@ -1,5 +1,5 @@
 const OpenAI = require('openai');
-const config = require('./config'); // ← OPCIONAL si agregas un config central
+const config = require('../config'); // ← OPCIONAL si agregas un config central
 
 // Pequeño "circuit breaker" para evitar spamear la API si hay 429 por cuota
 let quotaCooldownUntil = 0; // timestamp ms hasta el que no intentaremos llamar a la API
