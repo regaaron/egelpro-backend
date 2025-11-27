@@ -10,7 +10,7 @@ const serviceAccountConfig = {
     // los almacena literalmente como la cadena '\n'. Usamos replace(/\\n/g, '\n')
     // por si acaso, aunque no siempre es necesario.
     private_key: process.env.FIREBASE_PRIVATE_KEY ? 
-                 process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : 
+                 process.env.FIREBASE_PRIVATE_KEY : 
                  undefined,
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
     client_id: process.env.FIREBASE_CLIENT_ID,
@@ -28,6 +28,7 @@ if (!serviceAccountConfig.project_id || !serviceAccountConfig.private_key) {
     // throw new Error("Firebase admin initialization failed due to missing environment variables.");
 }
 
+console.log(process.env.FIREBASE_PRIVATE_KEY);
 // 3. Inicializar Firebase
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccountConfig),
