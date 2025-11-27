@@ -117,5 +117,71 @@ router.get("/racha/:uid",async(req,res)=>{
     }
 })
 
+router.get("/daily/:uid", async (req, res) => {
+  const { uid } = req.params;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT ultima_pregunta_diaria FROM usuarios WHERE uid = ?",
+      [uid]
+    );
+
+    if (rows.length === 0) {
+      // nunca ha hecho una → disponible
+      return res.json({ available: true });
+    }
+
+    const ultima = rows[0].ultima_pregunta_diaria;
+
+    if (!ultima) {
+      return res.json({ available: true });
+    }
+
+    const now = new Date();
+    const last = new Date(ultima);
+    const diffMs = now.getTime() - last.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffHours >= 24) {
+      return res.json({ available: true });
+    }
+
+    const remainingMs = 24 * 60 * 60 * 1000 - diffMs;
+    const nextAvailableAt = new Date(now.getTime() + remainingMs).toISOString();
+
+    return res.json({
+      available: false,
+      remainingMs,
+      nextAvailableAt
+    });
+
+  } catch (error) {
+    console.error("Error en /auth/daily:", error);
+    res
+      .status(500)
+      .json({ ok: false, message: "Error al verificar pregunta diaria" });
+  }
+});
+
+
+
+router.post("/daily/complete", async (req, res) => {
+  try {
+    const { uid, preguntaId } = req.body;
+
+    await pool.query(`
+      UPDATE usuarios
+      SET ultima_pregunta_diaria = NOW()
+      WHERE uid = ?
+    `, [uid]);
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error("Error en /daily/complete:", error);
+    res.status(500).json({ error: "Error al marcar pregunta diaria" });
+  }
+});
+
 
 module.exports = router;
