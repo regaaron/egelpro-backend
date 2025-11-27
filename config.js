@@ -15,5 +15,11 @@ module.exports = {
     key: process.env.OPENAI_API_KEY,
     model: process.env.OPENAI_MODEL || "gpt-4o-mini",
     enabled: process.env.OPENAI_ENABLED === "true"
+  },
+
+  firebase: {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
   }
 };
